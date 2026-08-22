@@ -1,0 +1,581 @@
+<script>
+/* ===========================================================================
+ *  빅데이터 학습실 — 학생 화면 (탭 전환 · 로그인 · 저장 · 이미지 · 제출)
+ *  © 2026 티쳐무 · 모든 권리 보유 (학교 수업 목적으로만 이용)
+ *
+ *  탭①(개념)은 로그인 없이 볼 수 있고, 탭②(활동지)는 제출을 위해 로그인한다.
+ *  로그인 표는 sessionStorage 에만 담는다 — 컴퓨터실에서 창을 닫으면 사라진다.
+ * ======================================================================== */
+(function () {
+  'use strict';
+
+  /* ------------------------- 작은 도우미 ------------------------- */
+  var $ = function (id) { return document.getElementById(id); };
+
+  /** 서버 함수를 약속(Promise)으로 부른다 */
+  function call(name) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return new Promise(function (done, fail) {
+      if (!window.google || !google.script || !google.script.run) {
+        fail(new Error('서버에 연결할 수 없습니다. 주소를 다시 열어 주세요.'));
+        return;
+      }
+      var r = google.script.run.withSuccessHandler(done).withFailureHandler(fail);
+      r[name].apply(r, args);
+    });
+  }
+
+  var toastTimer = null;
+  window.toast = function (msg, bad) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.className = 'toast on' + (bad ? ' bad' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.className = 'toast'; }, bad ? 4200 : 2600);
+  };
+
+  function errText(e) {
+    if (!e) return '알 수 없는 오류가 생겼습니다.';
+    return String(e.message || e).replace(/^Error:\s*/, '');
+  }
+
+  /* ------------------------- 상태 ------------------------- */
+  var APP = {
+    token: '', studentId: '', name: '',
+    accepting: true, maxImages: 3,
+    images: [],          /* [{fileId, url, name, dataUrl}] */
+    dirty: false, saving: false, submittedOnce: false
+  };
+
+  /* 활동지 글 항목 — Code.gs 의 FIELDS 와 이름이 같아야 한다 */
+  var TEXT_KEYS = ['topic', 'kw1', 'kw2', 'kw3', 'kw4', 'summary', 'q1', 'q2', 'q3', 'future', 'region'];
+  /* 채워야 하는 항목 수 (진행률의 분모) */
+  var NEED = ['tool', 'topic', 'kw1', 'kw2', 'period', 'summary', 'q1', 'q2', 'q3', 'future'];
+
+  /* ======================= 탭 전환 ======================= */
+  function showTab(n) {
+    $('tab1').classList.toggle('hidden', n !== 1);
+    $('tab2').classList.toggle('hidden', n !== 2);
+    $('tabBtn1').setAttribute('aria-selected', n === 1 ? 'true' : 'false');
+    $('tabBtn2').setAttribute('aria-selected', n === 2 ? 'true' : 'false');
+    try { location.hash = n === 2 ? 'activity' : 'concept'; } catch (e) { }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (n === 2) showScoreNote();
+  }
+
+  /* ======================= 로그인 ======================= */
+  function gateError(msg) {
+    var e = $('g_err');
+    e.textContent = msg;
+    e.className = msg ? 'err on' : 'err';
+  }
+
+  function step(n) {
+    $('step1').classList.toggle('hidden', n !== 1);
+    $('step2').classList.toggle('hidden', n !== 2);
+    gateError('');
+    setTimeout(function () { (n === 1 ? $('g_id') : ($('g_nameBox').classList.contains('hidden') ? $('g_pw') : $('g_name'))).focus(); }, 60);
+  }
+
+  function checkId() {
+    var id = $('g_id').value.trim();
+    if (!id) { gateError('학번을 적어 주세요.'); return; }
+    $('g_next').disabled = true;
+    call('checkStudent', id).then(function (r) {
+      $('g_next').disabled = false;
+      var klass = r.klass ? ' (' + r.klass + '반)' : '';
+      if (r.exists) {
+        $('g_who').innerHTML = '학번 <b>' + id + '</b>' + klass + ' · <b>' + r.maskedName + '</b> 학생이군요.' +
+          (r.needNewPassword
+            ? '<br>선생님이 비밀번호를 초기화했습니다. <b>새 비밀번호를 정해</b> 주세요. (쓰던 내용은 그대로 있습니다)'
+            : '<br>비밀번호를 넣어 주세요.');
+        $('g_nameBox').classList.add('hidden');
+        $('g_pw2Box').classList.toggle('hidden', !r.needNewPassword);
+      } else {
+        $('g_who').innerHTML = '학번 <b>' + id + '</b>' + klass + ' · <b>처음 오셨네요.</b><br>' +
+          '이름과 비밀번호를 정하면 시작합니다.';
+        $('g_nameBox').classList.remove('hidden');
+        $('g_pw2Box').classList.remove('hidden');
+      }
+      $('g_pw').value = ''; $('g_pw2').value = '';
+      step(2);
+    }).catch(function (e) {
+      $('g_next').disabled = false;
+      gateError(errText(e));
+    });
+  }
+
+  function signIn() {
+    var id = $('g_id').value.trim();
+    var nm = $('g_name').value.trim();
+    var pw = $('g_pw').value;
+    var pw2 = $('g_pw2Box').classList.contains('hidden') ? pw : $('g_pw2').value;
+    if (pw.length < 4) { gateError('비밀번호는 4자 이상으로 정해 주세요.'); return; }
+
+    $('g_in').disabled = true;
+    call('signIn', id, nm, pw, pw2).then(function (r) {
+      $('g_in').disabled = false;
+      afterLogin(r);
+    }).catch(function (e) {
+      $('g_in').disabled = false;
+      gateError(errText(e));
+    });
+  }
+
+  function afterLogin(r) {
+    APP.token = r.token;
+    APP.studentId = r.studentId;
+    APP.name = r.name;
+    APP.accepting = r.accepting !== false;
+    APP.submittedOnce = !!r.submitted;
+    try {
+      sessionStorage.setItem('bd-token', r.token);
+      sessionStorage.setItem('bd-id', r.studentId);
+    } catch (e) { }
+
+    $('gate').classList.add('hidden');
+    $('form').classList.remove('hidden');
+    $('whoText').innerHTML = '<b>' + r.studentId + ' ' + r.name + '</b> 학생' + (r.klass ? ' · ' + r.klass + '반' : '');
+    $('btnLogin').classList.add('hidden');
+    $('btnPw').classList.remove('hidden');
+    $('btnOut').classList.remove('hidden');
+    $('closedNote').style.display = APP.accepting ? 'none' : 'block';
+    $('btnSubmit').disabled = !APP.accepting;
+
+    if (r.answers) applyAnswers(r.answers);
+    setSaved(r.savedAt ? (r.from || '저장된 내용') + '을 불러왔다 (' + r.savedAt + ')' : '새로 시작한다', 'ok');
+    if (r.savedAt) window.toast((r.from || '저장된 내용') + '을 불러왔다');
+    updateProgress();
+    showScoreNote();
+  }
+
+  /**
+   * 나가기 — 이 컴퓨터에 남는 것을 모두 지운다.
+   * 로그인 정보(sessionStorage)만이 아니라 **탭①의 풀이 기록도** 지운다.
+   * 그러지 않으면 컴퓨터실에서 다음 학생에게 앞 학생의 답이 그대로 보인다.
+   */
+  function logout() {
+    var head = APP.dirty ? '저장하지 않은 내용이 있을 수 있습니다.\n\n' : '';
+    if (!confirm(head + '나갈까요?\n이 컴퓨터에 남은 로그인 정보와 탭①의 풀이 기록이 지워집니다.\n(제출한 내용은 선생님께 그대로 남아 있습니다)')) return;
+    try { sessionStorage.removeItem('bd-token'); sessionStorage.removeItem('bd-id'); } catch (e) { }
+    if (typeof window.clearConceptRecord === 'function') window.clearConceptRecord();
+    APP.dirty = false;
+    location.reload();
+  }
+
+  function changePw() {
+    var cur = prompt('지금 쓰는 비밀번호를 넣어 주세요.');
+    if (cur === null) return;
+    var np = prompt('새 비밀번호 (4자 이상)');
+    if (np === null) return;
+    if (String(np).length < 4) { window.toast('4자 이상으로 정해 주세요.', true); return; }
+    if (prompt('한 번 더 넣어 주세요.') !== np) { window.toast('두 번 넣은 값이 다릅니다.', true); return; }
+    call('changePassword', APP.token, APP.studentId, cur, np)
+      .then(function () { window.toast('비밀번호를 바꿨다.'); })
+      .catch(function (e) { window.toast(errText(e), true); });
+  }
+
+  /* ======================= 값 모으기 · 되돌리기 ======================= */
+  /**
+   * 검색 기간을 「2022-01-01 ~ 현재」 한 줄로 만든다.
+   * ⚠️ 빈 자리에 물음표 같은 글자를 넣지 않는다 — 다시 들어올 때 이 글을 날짜 칸으로
+   *    되돌려야 하므로(`applyAnswers`), 되돌릴 수 있는 꼴을 지켜야 한다.
+   */
+  function periodText() {
+    var f = $('f_from').value, t = $('f_to').value;
+    var end = $('f_now').checked ? '현재' : t;
+    if (!f && !end) return '';
+    return f + ' ~ ' + end;
+  }
+
+  function gather() {
+    var p = { studentId: APP.studentId };
+    TEXT_KEYS.forEach(function (k) { var el = $('f_' + k); p[k] = el ? el.value : ''; });
+    p.tool = pickedValue('toolPicks', 'tool');
+    p.device = pickedValue('devPicks', 'device');
+    p.period = periodText();
+    p.images = APP.images.filter(function (i) { return i.fileId; }).map(function (i) { return { fileId: i.fileId, url: i.url }; });
+    var sc = (typeof window.conceptScore === 'function') ? window.conceptScore() : null;
+    if (sc && sc.graded > 0) { p.conceptScore = sc.got; p.conceptTotal = sc.total; }
+    return p;
+  }
+
+  function applyAnswers(a) {
+    TEXT_KEYS.forEach(function (k) {
+      var el = $('f_' + k);
+      if (el && a[k] != null) el.value = a[k];
+    });
+    if (a.tool) setPicked('toolPicks', 'tool', a.tool);
+    if (a.device) setPicked('devPicks', 'device', a.device);
+
+    /* 「2026-01-01 ~ 현재」 꼴을 날짜 칸으로 되돌린다 */
+    var m = /^(\d{4}-\d{2}-\d{2})?\s*~\s*(.*)$/.exec(String(a.period || ''));
+    if (m) {
+      $('f_from').value = m[1] || '';
+      if (/현재/.test(m[2])) { $('f_now').checked = true; $('f_to').value = ''; }
+      else if (/^\d{4}-\d{2}-\d{2}$/.test(m[2])) $('f_to').value = m[2];
+    }
+    $('f_to').disabled = $('f_now').checked;
+
+    if (a.images && a.images.length) {
+      APP.images = a.images.map(function (i) { return { fileId: i.fileId, url: i.url, name: '올려 둔 그림' }; });
+      drawShots();
+      /* 그림 자체는 앱을 거쳐야 볼 수 있으므로 따로 받아 온다 */
+      call('getImages', APP.token, APP.studentId, APP.images.map(function (i) { return i.fileId; }))
+        .then(function (r) {
+          (r.images || []).forEach(function (got) {
+            APP.images.forEach(function (mine) {
+              if (mine.fileId === got.fileId) { mine.dataUrl = got.dataUrl; mine.name = got.name; }
+            });
+          });
+          drawShots();
+        }).catch(function () { /* 미리보기는 없어도 제출에는 지장 없다 */ });
+    }
+    countAll();
+    updateCond();
+  }
+
+  function pickedValue(boxId, attr) {
+    var on = $(boxId).querySelector('.pick.on');
+    return on ? on.getAttribute('data-' + attr) : '';
+  }
+  function setPicked(boxId, attr, val) {
+    $(boxId).querySelectorAll('.pick').forEach(function (b) {
+      var on = b.getAttribute('data-' + attr) === val;
+      b.classList.toggle('on', on);
+      b.querySelector('.mark').textContent = on ? '☑' : '□';
+    });
+  }
+
+  /* ======================= 진행률 · 글자 수 ======================= */
+  function filled(k) {
+    if (k === 'tool') return !!pickedValue('toolPicks', 'tool');
+    if (k === 'period') return !!$('f_from').value && ($('f_now').checked || !!$('f_to').value);
+    var el = $('f_' + k);
+    return !!(el && el.value.trim());
+  }
+
+  function updateProgress() {
+    var done = NEED.filter(filled).length;
+    $('pgDone').textContent = done;
+    $('pgAll').textContent = NEED.length;
+    $('pgBar').style.width = Math.round(done / NEED.length * 100) + '%';
+    var left = NEED.filter(function (k) { return !filled(k); });
+    var NAME = {
+      tool: '분석 도구', topic: '분석 주제', kw1: '키워드 1', kw2: '키워드 2', period: '검색 기간',
+      summary: '시각화 결과 요약', q1: 'Q1', q2: 'Q2', q3: 'Q3', future: '미래 예측'
+    };
+    $('pgLeft').innerHTML = left.length
+      ? '남은 항목: ' + left.map(function (k) { return NAME[k]; }).join(' · ')
+      : '<b style="color:#1a8f52">모두 채웠다! 제출할 수 있다.</b>';
+  }
+
+  function countOne(k) {
+    var el = $('f_' + k), c = $('c_' + k);
+    if (!el || !c) return;
+    var n = el.value.trim().length;
+    var max = el.getAttribute('maxlength');
+    c.textContent = n + (max ? ' / ' + max : '') + '자';
+    c.style.color = n === 0 ? '#5b6577' : (n < 20 && el.tagName === 'TEXTAREA' ? '#b5720b' : '#1a8f52');
+  }
+  function countAll() { ['topic', 'summary', 'q1', 'q2', 'q3', 'future'].forEach(countOne); }
+
+  function updateCond() {
+    var t = pickedValue('toolPicks', 'tool'), d = pickedValue('devPicks', 'device');
+    var r = $('f_region').value.trim(), p = periodText();
+    $('condPreview').innerHTML = (t || p || r || d)
+      ? '지금 설정 → <b>' + [t, p, r, d].filter(Boolean).join(' · ') + '</b>'
+      : '도구와 조건을 고르면 여기에 정리되어 보인다.';
+  }
+
+  function showScoreNote() {
+    var sc = (typeof window.conceptScore === 'function') ? window.conceptScore() : null;
+    var box = $('scoreNote');
+    if (!box) return;
+    if (!sc || sc.graded === 0) {
+      box.innerHTML = '탭①의 개념 문제를 아직 채점하지 않았다. ' +
+        '<b>탭①에서 [정답 확인] 을 누르면 점수가 함께 제출된다.</b> (안 해도 제출은 된다)';
+    } else {
+      box.innerHTML = '탭① 개념 점수 <b>' + sc.got + ' / ' + sc.total + '</b> 점' +
+        (sc.graded < sc.groups ? ' — 아직 채점하지 않은 부분이 ' + (sc.groups - sc.graded) + '개 있다.' : ' — 다 채점했다.') +
+        ' 이 점수가 활동지와 함께 제출된다.';
+    }
+  }
+
+  /* ======================= 자동 저장 ======================= */
+  var saveTimer = null;
+
+  function setSaved(msg, kind) {
+    var el = $('savedAt');
+    el.textContent = msg;
+    el.className = 'saved' + (kind === 'wait' ? ' wait' : kind === 'bad' ? ' bad' : '');
+  }
+
+  function touch() {
+    APP.dirty = true;
+    updateProgress();
+    updateCond();
+    setSaved('곧 저장한다…', 'wait');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(doSave, 2500);
+  }
+
+  function doSave(quiet) {
+    if (!APP.token || APP.saving || !APP.dirty) return Promise.resolve();
+    APP.saving = true;
+    setSaved('저장 중…', 'wait');
+    return call('saveDraft', APP.token, APP.studentId, gather()).then(function (r) {
+      APP.saving = false; APP.dirty = false;
+      setSaved('저장했다 (' + r.savedAt + ')', 'ok');
+      if (!quiet) { /* 자동 저장은 조용히 */ }
+    }).catch(function (e) {
+      APP.saving = false;
+      setSaved('저장하지 못했다 — ' + errText(e), 'bad');
+    });
+  }
+
+  /* ======================= 이미지 올리기 ======================= */
+  /** 그림을 가로 1400픽셀 아래로 줄이고 JPEG 로 바꾼다 (교실 인터넷을 아끼려고) */
+  function shrink(file) {
+    return new Promise(function (done, fail) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        var MAX = 1400;
+        var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+        if (!w || !h) { URL.revokeObjectURL(url); fail(new Error('그림을 읽지 못했습니다.')); return; }
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        var c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        var g = c.getContext('2d');
+        g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);   /* 투명 배경은 흰색으로 */
+        g.drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        done(c.toDataURL('image/jpeg', 0.9));
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); fail(new Error('그림 형식을 읽지 못했습니다.')); };
+      img.src = url;
+    });
+  }
+
+  function addFiles(files) {
+    if (!APP.token) { window.toast('먼저 로그인해 주세요.', true); return; }
+    var list = [];
+    for (var i = 0; i < files.length; i++) if (/^image\//.test(files[i].type)) list.push(files[i]);
+    if (!list.length) { window.toast('그림 파일만 올릴 수 있다.', true); return; }
+
+    var room = APP.maxImages - APP.images.length;
+    if (room <= 0) { window.toast('그림은 ' + APP.maxImages + '장까지 올릴 수 있다.', true); return; }
+    if (list.length > room) { window.toast(room + '장만 올린다 (최대 ' + APP.maxImages + '장)'); list = list.slice(0, room); }
+
+    list.forEach(function (f) {
+      var slot = { name: f.name || '캡처 그림', up: true };
+      APP.images.push(slot);
+      drawShots();
+      shrink(f).then(function (dataUrl) {
+        slot.dataUrl = dataUrl;
+        drawShots();
+        return call('uploadImage', APP.token, APP.studentId, slot.name, dataUrl);
+      }).then(function (r) {
+        slot.fileId = r.fileId; slot.url = r.url; slot.up = false;
+        drawShots();
+        window.toast('그림을 올렸다 (' + Math.round(r.bytes / 1024) + 'KB)');
+        APP.dirty = true; doSave(true);
+      }).catch(function (e) {
+        APP.images = APP.images.filter(function (x) { return x !== slot; });
+        drawShots();
+        window.toast(errText(e), true);
+      });
+    });
+  }
+
+  function drawShots() {
+    var box = $('shots');
+    box.innerHTML = '';
+    APP.images.forEach(function (im, i) {
+      var d = document.createElement('div');
+      d.className = 'shot' + (im.up ? ' up' : '');
+      var src = im.dataUrl || '';
+      d.innerHTML =
+        (src ? '<img src="' + src + '" alt="시각화 캡처 ' + (i + 1) + '">'
+             : '<div style="height:158px; display:flex; align-items:center; justify-content:center; background:#f4f6fa; color:#7a8496">그림 준비 중…</div>') +
+        '<div class="bar2"><span class="nm">' + (im.up ? '올리는 중… ' : '') + (im.name || '그림') + '</span>' +
+        (im.fileId ? '<button data-del="' + i + '">지우기</button>' : '') + '</div>';
+      if (src) d.querySelector('img').addEventListener('click', function () { openLightbox(src); });
+      var del = d.querySelector('[data-del]');
+      if (del) del.addEventListener('click', function () { removeShot(i); });
+      box.appendChild(d);
+    });
+    $('imgLimitTxt').textContent = '(' + APP.images.length + ' / ' + APP.maxImages + '장)';
+  }
+
+  function removeShot(i) {
+    var im = APP.images[i];
+    if (!im || !im.fileId) return;
+    if (!confirm('이 그림을 지울까요?')) return;
+    call('deleteImage', APP.token, APP.studentId, im.fileId).then(function () {
+      APP.images.splice(i, 1);
+      drawShots();
+      APP.dirty = true; doSave(true);
+      window.toast('그림을 지웠다.');
+    }).catch(function (e) { window.toast(errText(e), true); });
+  }
+
+  function openLightbox(src) {
+    $('lightboxImg').src = src;
+    $('lightbox').classList.add('on');
+  }
+
+  /* ======================= 제출 ======================= */
+  function submit() {
+    if (!APP.accepting) { window.toast('지금은 제출을 받지 않는다.', true); return; }
+    var left = NEED.filter(function (k) { return !filled(k); });
+    if (left.length) {
+      window.toast('아직 채우지 않은 항목이 ' + left.length + '개 있다.', true);
+      var first = left[0];
+      var el = first === 'tool' ? $('toolPicks') : first === 'period' ? $('f_from') : $('f_' + first);
+      if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (el.focus) el.focus(); }
+      return;
+    }
+    if (APP.images.some(function (i) { return i.up; })) { window.toast('그림을 올리는 중이다. 잠시 뒤 다시 눌러 주세요.', true); return; }
+    if (!APP.images.length && !confirm('시각화 캡처 그림을 올리지 않았습니다.\n그림 없이 제출할까요?')) return;
+    if (!confirm(APP.submittedOnce ? '고친 내용으로 다시 제출할까요?' : '이대로 제출할까요?')) return;
+
+    $('btnSubmit').disabled = true;
+    $('submitHint').textContent = '보내는 중…';
+    call('submitForm', APP.token, gather()).then(function (r) {
+      $('btnSubmit').disabled = false;
+      APP.dirty = false;
+      APP.submittedOnce = true;
+      $('submitHint').textContent = '';
+      $('btnSubmit').textContent = '고쳐서 다시 제출하기';
+      $('doneBox').classList.remove('hidden');
+      $('doneWhen').innerHTML = r.time + ' 에 ' + (r.updated ? '<b>다시</b> 제출했다 (' + r.count + '번째)' : '제출했다');
+      $('doneCode').textContent = '확인 번호  ' + r.code;
+      $('doneBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setSaved('제출을 마쳤다 (' + r.time + ')', 'ok');
+      window.toast('제출을 마쳤다!');
+    }).catch(function (e) {
+      $('btnSubmit').disabled = false;
+      $('submitHint').textContent = '';
+      window.toast(errText(e), true);
+    });
+  }
+
+  /* ======================= 시작 ======================= */
+  document.addEventListener('DOMContentLoaded', function () {
+    /* 탭 */
+    $('tabBtn1').addEventListener('click', function () { showTab(1); });
+    $('tabBtn2').addEventListener('click', function () { showTab(2); });
+    if (/activity/.test(location.hash)) showTab(2);
+
+    /* 상단 단추 */
+    $('btnLogin').addEventListener('click', function () { showTab(2); setTimeout(function () { $('g_id').focus(); }, 200); });
+    $('btnOut').addEventListener('click', logout);
+    $('btnPw').addEventListener('click', changePw);
+
+    /* 로그인 */
+    $('g_next').addEventListener('click', checkId);
+    $('g_in').addEventListener('click', signIn);
+    $('g_back').addEventListener('click', function () { step(1); });
+    $('g_id').addEventListener('keydown', function (e) { if (e.key === 'Enter') checkId(); });
+    ['g_name', 'g_pw', 'g_pw2'].forEach(function (id) {
+      $(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') signIn(); });
+    });
+
+    /* 글 항목 */
+    TEXT_KEYS.forEach(function (k) {
+      var el = $('f_' + k);
+      if (!el) return;
+      el.addEventListener('input', function () { countOne(k); touch(); });
+    });
+
+    /* 고르는 항목 */
+    ['toolPicks', 'devPicks'].forEach(function (boxId) {
+      var attr = boxId === 'toolPicks' ? 'tool' : 'device';
+      $(boxId).querySelectorAll('.pick').forEach(function (b) {
+        b.addEventListener('click', function () {
+          setPicked(boxId, attr, b.getAttribute('data-' + attr));
+          touch();
+        });
+      });
+    });
+
+    /* 검색 조건 */
+    ['f_from', 'f_to'].forEach(function (id) { $(id).addEventListener('change', touch); });
+    $('f_now').addEventListener('change', function () {
+      $('f_to').disabled = $('f_now').checked;
+      touch();
+    });
+    document.querySelectorAll('[data-region]').forEach(function (b) {
+      b.addEventListener('click', function () { $('f_region').value = b.dataset.region; touch(); });
+    });
+
+    /* 이미지 — 고르기 · 끌어다 놓기 · 붙여넣기 */
+    $('drop').addEventListener('click', function () { $('file').click(); });
+    $('drop').addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file').click(); } });
+    $('file').addEventListener('change', function (e) { addFiles(e.target.files); e.target.value = ''; });
+    ['dragenter', 'dragover'].forEach(function (t) {
+      $('drop').addEventListener(t, function (e) { e.preventDefault(); $('drop').classList.add('over'); });
+    });
+    ['dragleave', 'drop'].forEach(function (t) {
+      $('drop').addEventListener(t, function (e) { e.preventDefault(); $('drop').classList.remove('over'); });
+    });
+    $('drop').addEventListener('drop', function (e) {
+      if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
+    });
+    document.addEventListener('paste', function (e) {
+      if (!APP.token || $('tab2').classList.contains('hidden')) return;
+      var items = (e.clipboardData && e.clipboardData.items) || [];
+      var files = [];
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].kind === 'file' && /^image\//.test(items[i].type)) {
+          var f = items[i].getAsFile();
+          if (f) files.push(f);
+        }
+      }
+      if (files.length) { e.preventDefault(); addFiles(files); }
+    });
+
+    /* 크게 보기 닫기 */
+    $('lightboxX').addEventListener('click', function () { $('lightbox').classList.remove('on'); });
+    $('lightbox').addEventListener('click', function (e) { if (e.target.id === 'lightbox') $('lightbox').classList.remove('on'); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') $('lightbox').classList.remove('on'); });
+
+    /* 저장 · 제출 */
+    $('btnSave').addEventListener('click', function () {
+      APP.dirty = true;
+      doSave().then(function () { window.toast('임시 저장했다.'); });
+    });
+    $('btnSubmit').addEventListener('click', submit);
+
+    /* 60초마다 한 번 더 확인 (자리를 비운 동안 날아가지 않게) */
+    setInterval(function () { if (APP.dirty) doSave(true); }, 60000);
+    window.addEventListener('beforeunload', function (e) {
+      if (APP.dirty) { e.preventDefault(); e.returnValue = ''; }
+    });
+
+    countAll();
+    updateCond();
+
+    /* 제출 받는 중인지 확인 + 새로고침했으면 이어서 로그인 */
+    call('getStatus').then(function (s) {
+      APP.accepting = s.accepting !== false;
+      APP.maxImages = s.maxImages || 3;
+      drawShots();
+      if (!APP.accepting) {
+        $('closedNote').style.display = 'block';
+        $('btnSubmit').disabled = true;
+      }
+    }).catch(function () { /* 상태를 못 읽어도 화면은 쓸 수 있다 */ });
+
+    var t = null, id = null;
+    try { t = sessionStorage.getItem('bd-token'); id = sessionStorage.getItem('bd-id'); } catch (e) { }
+    if (t && id) {
+      call('resume', t, id).then(afterLogin).catch(function () {
+        try { sessionStorage.removeItem('bd-token'); sessionStorage.removeItem('bd-id'); } catch (e) { }
+      });
+    }
+  });
+})();
+</script>

@@ -1,0 +1,16 @@
+{
+  "name": "trend-bigdata",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "빅데이터 학습실 — 데이터 과학 학습지 웹앱 (Google Apps Script). 탭① 빅데이터의 개념과 특징(3V) · 탭② 검색어 트렌드 분석 활동지 제출",
+  "author": "티쳐무",
+  "type": "module",
+  "scripts": {
+    "check": "node tools/check.mjs",
+    "test": "node test/run.mjs",
+    "preview": "node tools/preview.mjs",
+    "build": "npm run check && npm test && npm run preview",
+    "start": "node tools/preview.mjs"
+  }
+}

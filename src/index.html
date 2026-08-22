@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!--
+  빅데이터 학습실 — 데이터 과학 학습지 웹앱 (Google Apps Script)
+  탭① 빅데이터의 개념과 특징(3V) · 탭② 검색어 트렌드 분석 활동지(제출)
+
+  © 2026 티쳐무 · 모든 권리 보유
+  이 코드와 화면의 무단 배포·상업적 이용을 금합니다. 학교 수업 목적으로만 이용해 주세요.
+-->
+<html lang="ko">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <?!= include('css'); ?>
+</head>
+<body>
+
+<!-- ─────────────── 상단 바 ─────────────── -->
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">빅데이터 <span>학습실</span>
+      <small>데이터 과학 학습지 · 빅데이터의 개념과 검색어 트렌드 분석</small>
+    </div>
+    <div class="who">
+      <span id="whoText">활동지를 낼 때 로그인합니다</span>
+      <button class="btn sm ghost" id="btnLogin">로그인</button>
+      <button class="btn sm gray hidden" id="btnPw">🔑 비밀번호</button>
+      <button class="btn sm gray hidden" id="btnOut">나가기</button>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab" id="tabBtn1" role="tab" aria-selected="true"  aria-controls="tab1"><span class="n">1</span>빅데이터의 개념과 특징</button>
+    <button class="tab" id="tabBtn2" role="tab" aria-selected="false" aria-controls="tab2"><span class="n">2</span>검색어 트렌드 분석하기</button>
+  </nav>
+</header>
+
+<main class="wrap">
+  <!-- ─────────────── 탭① 개념 (인터랙티브) ─────────────── -->
+  <section id="tab1" role="tabpanel" aria-labelledby="tabBtn1">
+    <?!= include('concept'); ?>
+  </section>
+
+  <!-- ─────────────── 탭② 활동지 (제출) ─────────────── -->
+  <section id="tab2" role="tabpanel" aria-labelledby="tabBtn2" class="hidden">
+    <?!= include('activity'); ?>
+  </section>
+</main>
+
+<footer class="foot">
+  <b>© 2026 티쳐무 · 모든 권리 보유</b><br>
+  학교 수업 목적으로만 이용해 주세요. 무단 배포 및 상업적 이용을 금합니다.<br>
+  이 앱은 이름·학번 외의 개인정보를 받지 않으며, 답안은 선생님의 스프레드시트에만 저장됩니다.
+</footer>
+
+<!-- 그림 크게 보기 -->
+<div class="lightbox" id="lightbox">
+  <button class="x" id="lightboxX" title="닫기">✕</button>
+  <img id="lightboxImg" alt="크게 본 그림">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<?!= include('js'); ?>
+</body>
+</html>

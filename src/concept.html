@@ -1,0 +1,917 @@
+<!--
+  탭① 빅데이터의 개념과 특징 — 학습지 1쪽을 인터랙티브 화면으로 옮긴 것
+  © 2026 티쳐무 · 모든 권리 보유 (학교 수업 목적으로만 이용)
+
+  구조: 1.1 개념(판정 퀴즈) → 1.2 데이터 유형(괄호·분류 게임) →
+        1.3 3V(단위 저울·실시간 카운터·다양성 그래프) → 5V 매칭 → 확인 문제 → 점수
+  채점은 모두 브라우저 안에서 한다. 점수만 탭②에서 함께 제출된다.
+-->
+
+<div class="goal">
+  🎯 <b>학습목표</b> — 빅데이터의 개념과 특징을 설명할 수 있다.
+</div>
+
+<!-- ═══════════════ 1.1 빅데이터의 개념 ═══════════════ -->
+<div class="card">
+  <h2><span class="num">1.1</span> 빅데이터의 개념</h2>
+  <p class="lead">빅데이터는 「많다」는 말만으로는 설명되지 않는다. 두 가지 뜻을 함께 갖는다.</p>
+
+  <div class="grid2">
+    <div class="def">
+      <span class="tag">뜻 ①  데이터로서</span>
+      <div style="font-size:18px; font-weight:700">생성 주기가 짧은 <b style="color:#2b5bd7">방대한 규모</b>의 디지털 데이터</div>
+      <p class="hint">＊ 새로 쌓이는 <b>주기가 짧고</b>(빠르고), <b>양이 방대하며</b>, <b>디지털</b>이어야 한다.</p>
+    </div>
+    <div class="def">
+      <span class="tag">뜻 ②  기술로서</span>
+      <div style="font-size:18px; font-weight:700">데이터를 수집·저장·관리·분석할 수 있는 역량을 넘어서
+        대량의 데이터로부터 <b style="color:#7b3fc4">가치를 추출</b>하고 결과를 분석하는 기술</div>
+      <p class="hint">＊ 지금까지의 <b>역량을 넘어선</b> 규모라서, 그것을 다루는 <b>기술</b>까지 빅데이터라 부른다.</p>
+    </div>
+  </div>
+
+  <h3>🔎 이것도 빅데이터일까?</h3>
+  <p class="lead">위의 두 뜻에 비추어 판단해 보자. 「빅데이터라 할 수 있다 ○ / 아니다 ✕」</p>
+  <div id="q11"></div>
+  <div class="btnrow">
+    <button class="btn" data-check="g11">정답 확인</button>
+    <button class="btn gray sm" data-again="g11">다시 풀기</button>
+    <span class="hint" id="s11"></span>
+  </div>
+</div>
+
+<!-- ═══════════════ 1.2 데이터 유형 ═══════════════ -->
+<div class="card">
+  <h2><span class="num">1.2</span> 빅데이터의 데이터 유형</h2>
+  <p class="lead">
+    스마트 기기와 사물인터넷의 확산으로 데이터를 <b>생산하는 사물의 범위</b>가 기하급수적으로 증가하여,
+    <b>다양한 유형</b>의 디지털 데이터가 급격히 늘어났다.
+  </p>
+
+  <div class="grid2">
+    <!-- 정형 -->
+    <div class="def">
+      <div style="font-size:20px; font-weight:800; margin-bottom:6px">
+        <span class="paren">(</span>
+        <input class="blank" id="b_st" data-blank="st" placeholder="?" autocomplete="off">
+        <span class="paren">)</span> 데이터
+        <button class="btn sm gray" data-hint="st" style="float:right">힌트</button>
+      </div>
+      <p>고정된 <b>형식과 구조</b>에 맞게 저장된 데이터</p>
+      <p class="hint">◯예 행과 열로 데이터를 구별하는 <b>표</b>, 콤마(,)로 데이터를 구별하는 <b>CSV</b> 형식 등</p>
+
+      <div style="margin-top:10px">
+        <div class="btnrow" style="margin-top:0">
+          <button class="btn sm ghost" id="btnFormToggle">표 ↔ CSV 바꿔 보기</button>
+          <span class="hint" id="formNote">같은 데이터를 두 가지 정형 형식으로 본다</span>
+        </div>
+        <div id="tableView" style="margin-top:9px">
+          <div class="scroll"><table class="t">
+            <tr><th>ID</th><th>Name</th><th>AGE</th><th>SEX</th></tr>
+            <tr><td>01</td><td>KIM</td><td>32</td><td>M</td></tr>
+            <tr><td>02</td><td>LEE</td><td>26</td><td>F</td></tr>
+            <tr><td>03</td><td>PARK</td><td>72</td><td>F</td></tr>
+            <tr><td>04</td><td>CHOI</td><td>15</td><td>M</td></tr>
+          </table></div>
+        </div>
+        <div id="csvView" class="hidden" style="margin-top:9px">
+<pre class="csv">ID,Name,AGE,SEX
+01,KIM,32,M
+02,LEE,26,F
+03,PARK,72,F
+04,CHOI,15,M</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 비정형 -->
+    <div class="def">
+      <div style="font-size:20px; font-weight:800; margin-bottom:6px">
+        <span class="paren">(</span>
+        <input class="blank" id="b_un" data-blank="un" placeholder="?" autocomplete="off">
+        <span class="paren">)</span> 데이터
+        <button class="btn sm gray" data-hint="un" style="float:right">힌트</button>
+      </div>
+      <p>고정된 <b>구조나 형태가 없는</b> 데이터</p>
+      <p class="hint">◯예 <b>이미지</b>, <b>소리</b>, <b>보고서(문서)</b> 등</p>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; text-align:center; font-size:14.5px; color:#5b6577">
+        <div style="flex:1 1 70px"><div style="font-size:34px">🖼️</div>이미지</div>
+        <div style="flex:1 1 70px"><div style="font-size:34px">🔊</div>소리</div>
+        <div style="flex:1 1 70px"><div style="font-size:34px">🎬</div>동영상</div>
+        <div style="flex:1 1 70px"><div style="font-size:34px">📄</div>문서</div>
+        <div style="flex:1 1 70px"><div style="font-size:34px">💬</div>대화 글</div>
+        <div style="flex:1 1 70px"><div style="font-size:34px">📍</div>위치</div>
+      </div>
+      <p class="hint" style="margin-top:12px">＊ 이런 자료는 <b>칸을 정해 담을 수 없어서</b> 예전에는 분석 대상으로 삼기 어려웠다.</p>
+    </div>
+  </div>
+
+  <div class="btnrow">
+    <button class="btn" data-check="gbl">괄호 정답 확인</button>
+    <button class="btn gray sm" data-again="gbl">다시 풀기</button>
+    <span class="hint" id="sbl"></span>
+  </div>
+
+  <h3>🧺 정형 · 비정형으로 나누어 보기</h3>
+  <p class="lead">카드마다 <b>정형</b>인지 <b>비정형</b>인지 눌러 보자. 「칸(행·열)이 정해져 있는가」가 갈림길이다.</p>
+  <div class="cards" id="sortCards"></div>
+  <div class="btnrow">
+    <button class="btn" data-check="gsort">정답 확인</button>
+    <button class="btn gray sm" data-again="gsort">다시 풀기</button>
+    <span class="hint" id="ssort"></span>
+  </div>
+</div>
+
+<!-- ═══════════════ 1.3 3V ═══════════════ -->
+<div class="card">
+  <h2><span class="num">1.3</span> 빅데이터의 특징 3V</h2>
+  <p class="lead">규모(Volume) · 속도(Velocity) · 다양성(Variety) — 세 낱말의 첫 글자가 모두 V 라서 3V 라 부른다.</p>
+
+  <!-- Volume -->
+  <h3>Volume · 규모</h3>
+  <div class="vhead"><span class="vbadge">VOLUME</span>
+    <div style="font-size:17px">기술의 발전과 IT의 일상화로 디지털
+      <span class="paren">(</span>
+      <input class="blank" id="b_vol" data-blank="vol" placeholder="?" autocomplete="off">
+      <span class="paren">)</span>이 기하급수적으로 폭증
+      <button class="btn sm gray" data-hint="vol">힌트</button>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="side old">
+      <div class="cap">기존 자료 처리</div>
+      <div style="text-align:center; font-size:40px">💿</div>
+      <div style="text-align:center; font-weight:800; font-size:18px">MB · GB 단위</div>
+    </div>
+    <div class="arrow">▶</div>
+    <div class="side big">
+      <div class="cap">빅데이터</div>
+      <div style="text-align:center; font-size:40px">🗄️</div>
+      <div style="text-align:center; font-weight:800; font-size:18px">TB · PB · EB 단위</div>
+    </div>
+  </div>
+
+  <div class="def" style="margin-top:12px">
+    <div style="font-weight:800; font-size:17px">⚖️ 단위 저울 — 손잡이를 옮겨 보자</div>
+    <input type="range" id="volRange" min="0" max="6" step="1" value="2">
+    <div class="tick"><span>B</span><span>KB</span><span>MB</span><span>GB</span><span>TB</span><span>PB</span><span>EB</span></div>
+    <div style="display:flex; gap:18px; align-items:flex-end; flex-wrap:wrap; margin-top:6px">
+      <div>
+        <div class="big-num" id="volName">1 MB</div>
+        <div class="hint" id="volCalc"></div>
+      </div>
+      <div style="flex:1 1 260px">
+        <div style="font-size:17px" id="volLike"></div>
+        <div style="margin-top:6px"><span id="volZone"></span></div>
+      </div>
+    </div>
+    <div class="bars" id="volBars"></div>
+    <p class="hint">＊ 한 단계 오를 때마다 <b>1,024배</b>다. 세 단계만 올라도 10억 배가 넘는다.</p>
+  </div>
+
+  <!-- Velocity -->
+  <h3>Velocity · 속도</h3>
+  <div class="vhead"><span class="vbadge vel">VELOCITY</span>
+    <div style="font-size:17px">
+      <span class="paren">(</span>
+      <input class="blank" id="b_vel" data-blank="vel" placeholder="?" autocomplete="off">
+      <span class="paren">)</span> 정보 증가
+      <button class="btn sm gray" data-hint="vel">힌트</button>
+    </div>
+  </div>
+  <p>대규모의 데이터 처리 및 <b>가치 있는 현 정보 활용</b>을 위해 데이터 처리 및 <b>분석 속도</b>가 중요하다.</p>
+
+  <div class="def" style="margin-top:10px">
+    <div style="font-weight:800; font-size:17px">⏱️ 초에 몇 건씩 쌓이면 얼마나 모일까?</div>
+    <div class="note tip" style="margin-top:8px">아래 숫자는 실제 통계가 아니라 <b>우리가 정한 가정</b>이다. 「주기가 짧으면 양이 어떻게 되는지」를 보기 위한 것이다.</div>
+    <input type="range" id="velRange" min="0" max="60" step="1" value="30">
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+      <div class="big-num" id="velRate">1,000<small> 건/초</small></div>
+      <div class="btnrow" style="margin:0 0 0 auto">
+        <button class="btn sm gray" data-vel="1">우리 학교쯤 (1건/초)</button>
+        <button class="btn sm gray" data-vel="1000">인기 앱쯤 (1천건/초)</button>
+        <button class="btn sm gray" data-vel="60000">전 세계 검색쯤 (6만건/초)</button>
+      </div>
+    </div>
+    <div class="counter">
+      <div class="box"><div class="k">1분이면</div><div class="v" id="vel1m">-</div></div>
+      <div class="box"><div class="k">1시간이면</div><div class="v" id="vel1h">-</div></div>
+      <div class="box"><div class="k">하루면</div><div class="v" id="vel1d">-</div></div>
+      <div class="box"><div class="k">한 해면</div><div class="v" id="vel1y">-</div></div>
+    </div>
+    <div class="btnrow">
+      <button class="btn ghost" id="velPlay">▶ 지금부터 세어 보기</button>
+      <button class="btn gray sm" id="velReset">↺ 처음으로</button>
+      <div style="margin-left:auto; text-align:right">
+        <div class="hint">지켜본 시간 <b id="velSec">0</b>초 동안 쌓인 건수</div>
+        <div class="big-num" id="velLive" style="font-size:28px">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="def" style="margin-top:12px">
+    <div style="font-weight:800; font-size:17px">📄 월말 요금 고지서 ↔ 📱 실시간 사용량 앱</div>
+    <p class="hint">같은 자료라도 <b>언제 알 수 있는지</b>가 다르다. [한 달 흘려보내기] 를 눌러 보자.</p>
+    <div class="compare">
+      <div class="side old">
+        <div class="cap">기존 자료 처리 · 월말의 요금 고지서</div>
+        <div style="text-align:center; font-size:34px">📄</div>
+        <div style="text-align:center"><span class="big-num" id="oldMoney" style="font-size:26px">? 원</span></div>
+        <div class="hint" style="text-align:center" id="oldNote">한 달이 끝나야 알 수 있다</div>
+      </div>
+      <div class="arrow">▶</div>
+      <div class="side big">
+        <div class="cap">빅데이터 · 실시간 사용량 앱</div>
+        <div style="text-align:center; font-size:34px">📱</div>
+        <div style="text-align:center"><span class="big-num" id="newMoney" style="font-size:26px">0 원</span></div>
+        <div class="hint" style="text-align:center" id="newNote">쓰는 순간 바로 보인다</div>
+      </div>
+    </div>
+    <div class="btnrow">
+      <button class="btn ghost" id="monthPlay">▶ 한 달 흘려보내기</button>
+      <span class="hint">오늘 <b id="dayNo">1</b>일 / 30일</span>
+      <div class="meter" style="max-width:340px"><i id="dayBar"></i></div>
+    </div>
+  </div>
+
+  <!-- Variety -->
+  <h3>Variety · 다양성</h3>
+  <div class="vhead"><span class="vbadge var">VARIETY</span>
+    <div style="font-size:17px">
+      <span class="paren">(</span>
+      <input class="blank" id="b_var" data-blank="var" placeholder="?" autocomplete="off" style="width:11em">
+      <span class="paren">)</span>의 자료를 처리
+      <button class="btn sm gray" data-hint="var">힌트</button>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="side old">
+      <div class="cap">기존 자료 처리</div>
+      <div style="text-align:center; font-size:34px">🗃️</div>
+      <div style="text-align:center; font-weight:700">고객 신상 자료 · 매출 자료<br>재고 자료 · 회계 자료 등</div>
+      <div class="hint" style="text-align:center">대부분 <b>정형</b> — 칸이 정해진 표</div>
+    </div>
+    <div class="arrow">▶</div>
+    <div class="side big">
+      <div class="cap">빅데이터</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; text-align:center; font-size:14px">
+        <div style="flex:1 1 62px"><div style="font-size:26px">🎬</div>동영상</div>
+        <div style="flex:1 1 62px"><div style="font-size:26px">🎵</div>음악</div>
+        <div style="flex:1 1 62px"><div style="font-size:26px">💬</div>메시지</div>
+        <div style="flex:1 1 62px"><div style="font-size:26px">👍</div>소셜<br>미디어</div>
+        <div style="flex:1 1 62px"><div style="font-size:26px">📍</div>위치<br>정보</div>
+        <div style="flex:1 1 62px"><div style="font-size:26px">📝</div>게시물</div>
+      </div>
+      <div class="hint" style="text-align:center; margin-top:6px"><b>비정형</b>이 크게 늘었다</div>
+    </div>
+  </div>
+
+  <div class="def" style="margin-top:12px">
+    <div style="font-weight:800; font-size:17px">📱 내 기기에는 어떤 데이터가 있을까?</div>
+    <p class="hint">가지고 있는 것을 눌러 보자. <b>고른 것은 이 화면에서만 세어 보고 어디에도 보내지 않는다.</b></p>
+    <div class="checks" id="myData"></div>
+    <div class="pie" style="margin-top:14px">
+      <div class="circle" id="myPie"></div>
+      <div class="legend">
+        <div class="row"><span class="sw" style="background:#2b5bd7"></span> 정형 <b id="pieS">0</b>가지</div>
+        <div class="row"><span class="sw" style="background:#7b3fc4"></span> 비정형 <b id="pieU">0</b>가지</div>
+        <div class="row" id="pieMsg" style="color:#5b6577; max-width:330px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5V -->
+  <h3>3V 에 더해지기도 하는 두 가지</h3>
+  <div class="grid2">
+    <div class="def"><span class="tag">Value · 가치</span>
+      <div style="font-size:17px"><b>숨겨진 가치</b>를 찾음</div>
+      <p class="hint">아무리 많이 모아도 뜻을 뽑아내지 못하면 쓸모가 없다.</p>
+    </div>
+    <div class="def"><span class="tag">Veracity · 정확성</span>
+      <div style="font-size:17px"><b>유용하고 신뢰할 수 있는</b> 데이터를 다룸</div>
+      <p class="hint">잘못된 자료로 분석하면 결론도 잘못된다.</p>
+    </div>
+  </div>
+
+  <h3>🃏 이 사례는 어떤 V 일까?</h3>
+  <div id="qv"></div>
+  <div class="btnrow">
+    <button class="btn" data-check="gv">정답 확인</button>
+    <button class="btn gray sm" data-again="gv">다시 풀기</button>
+    <span class="hint" id="sv"></span>
+  </div>
+</div>
+
+<!-- ═══════════════ 확인 문제 ═══════════════ -->
+<div class="card">
+  <h2>✅ 배운 것 확인하기</h2>
+  <div id="qf"></div>
+  <div class="btnrow">
+    <button class="btn" data-check="gf">정답 확인</button>
+    <button class="btn gray sm" data-again="gf">다시 풀기</button>
+    <span class="hint" id="sf"></span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>📊 내 점수</h2>
+  <div class="score">
+    <div class="big"><span id="scGot">0</span><small> / <span id="scAll">0</span></small></div>
+    <div style="flex:1 1 200px">
+      <div class="meter"><i id="scBar"></i></div>
+      <div class="hint" id="scMsg" style="margin-top:6px">문제를 풀고 [정답 확인] 을 누르면 점수가 쌓인다.</div>
+    </div>
+    <button class="btn gray sm" id="scClear">↺ 전부 다시 풀기</button>
+  </div>
+  <div class="scroll" style="margin-top:12px">
+    <table class="t" id="scTable">
+      <tr><th>부분</th><th>맞은 개수</th><th>문항 수</th></tr>
+    </table>
+  </div>
+  <div class="note ok">
+    이 점수는 <b>탭②의 활동지를 제출할 때 함께</b> 선생님께 전달된다.
+    (같은 컴퓨터·같은 브라우저에서는 다시 들어와도 남아 있다.)
+  </div>
+</div>
+
+<script>
+/* ===========================================================================
+ *  탭① 빅데이터 개념 — 문항 자료와 채점
+ *  © 2026 티쳐무 · 모든 권리 보유
+ * ======================================================================== */
+(function () {
+  'use strict';
+
+  var SAVE_KEY = 'bigdata-concept-v1';
+
+  /* ---------------- ① 괄호 채우기 (학습지의 괄호 그대로) ---------------- */
+  var BLANKS = {
+    st:  { ok: ['정형', '정형데이터'],                       show: '정형',        hint: 'ㅈㅎ  (칸이 정해져 있다)' },
+    un:  { ok: ['비정형', '비정형데이터'],                   show: '비정형',      hint: 'ㅂㅈㅎ  (칸이 없다)' },
+    vol: { ok: ['정보량', '정보양'],                         show: '정보량',      hint: 'ㅈㅂㄹ  (정보의 ○○)' },
+    vel: { ok: ['실시간성', '실시간'],                       show: '실시간성',    hint: 'ㅅㅅㄱㅅ  (바로바로)' },
+    var: { ok: ['다양한형태', '다양한형태의', '다양성'],     show: '다양한 형태', hint: 'ㄷㅇㅎ ㅎㅌ' }
+  };
+
+  /* ---------------- ② 1.1 빅데이터일까? (○ / ✕) ---------------- */
+  var Q11 = [
+    { t: '우리 반 학생 30명의 키를 적어 둔 표', a: 'X',
+      w: '규모가 작고 새로 쌓이지도 않는다. 디지털이라도 <b>방대한 규모</b>가 아니면 빅데이터라 하지 않는다.' },
+    { t: '전국 편의점에서 하루에 수백만 건씩 쌓이는 결제 기록', a: 'O',
+      w: '생성 주기가 짧고(계속 쌓임) 규모가 방대하다. 두 조건을 모두 갖췄다.' },
+    { t: '도서관에서 종이 대출 카드에 손으로 적어 온 기록', a: 'X',
+      w: '<b>디지털 데이터가 아니다.</b> 아무리 오래 모았어도 종이 기록은 빅데이터가 아니다.' },
+    { t: '시내버스 수천 대가 몇 초마다 보내오는 위치 정보', a: 'O',
+      w: '사물인터넷 자료의 대표 사례다. 주기가 매우 짧아 순식간에 방대해진다.' },
+    { t: '내가 어제 쓴 일기 파일 한 개', a: 'X',
+      w: '디지털이지만 규모가 작다. 「파일 하나」는 분석할 대상이 못 된다.' },
+    { t: '유튜브에 1분마다 수백 시간씩 올라오는 동영상', a: 'O',
+      w: '주기·규모 모두 빅데이터이고, 게다가 <b>비정형</b> 자료라 다루는 기술도 필요하다.' }
+  ];
+
+  /* ---------------- ③ 1.2 정형 · 비정형 분류 (S = 정형, U = 비정형) ---------------- */
+  var SORTS = [
+    { i: '📊', t: '반별 성적이 행과 열로 정리된 표',        a: 'S', w: '행·열이라는 <b>고정된 구조</b>가 있다.' },
+    { i: '📷', t: '학교 축제에서 찍은 사진 200장',           a: 'U', w: '그림은 담을 칸을 정할 수 없다.' },
+    { i: '📄', t: '콤마로 구분된 판매 기록 <span class="mono">sale.csv</span>', a: 'S',
+      w: 'CSV 는 콤마로 항목을 구별하는 <b>정형</b> 형식이다. 학습지의 예시 그대로다.' },
+    { i: '🔊', t: '친구에게 보낸 음성 메시지',               a: 'U', w: '소리는 비정형의 대표 예다.' },
+    { i: '📚', t: '도서관 대출 기록 (회원번호·도서번호·날짜)', a: 'S', w: '항목이 정해진 표다.' },
+    { i: '📝', t: '수업 시간에 쓴 보고서 문서',              a: 'U', w: '문서(보고서)는 형식이 자유롭다. 학습지의 예시다.' },
+    { i: '🌡️', t: '기상청 기온 관측값 (시각·기온·습도 열)',  a: 'S', w: '측정값이 정해진 열에 들어간다.' },
+    { i: '🎬', t: '유튜브에 올린 동영상',                    a: 'U', w: '영상은 칸으로 나눌 수 없다.' },
+    { i: '📋', t: '학생 명단 엑셀 파일 (학번·이름·반)',      a: 'S', w: '엑셀 표는 정형이다.' },
+    { i: '💬', t: '메신저 대화 내용',                        a: 'U', w: '<b>글이지만</b> 정해진 칸이 없어 비정형이다.' },
+    { i: '✍️', t: '손으로 쓴 메모를 찍은 사진',              a: 'U', w: '내용이 글이어도 <b>사진 파일</b>이므로 비정형이다.' },
+    { i: '🏪', t: '편의점 판매 시점(POS) 기록 표',           a: 'S', w: '언제·무엇·얼마가 열로 정해져 있다.' }
+  ];
+
+  /* ---------------- ④ 5V 매칭 ---------------- */
+  var VOPT = ['Volume 규모', 'Velocity 속도', 'Variety 다양성', 'Value 가치', 'Veracity 정확성'];
+  var QV = [
+    { t: '하루에 쌓이는 기록이 5PB나 된다.',                          a: 0, w: '양(규모)을 말하고 있다.' },
+    { t: '지진을 감지하고 3초 만에 경보를 보낸다.',                   a: 1, w: '<b>지금</b> 쓸 수 있어야 뜻이 있다 — 속도.' },
+    { t: '사진·음성·문서가 뒤섞여 들어온다.',                         a: 2, w: '유형이 여러 가지 — 다양성.' },
+    { t: '구매 기록을 분석해 숨어 있던 취향을 찾아 추천한다.',         a: 3, w: '숨겨진 <b>가치</b>를 찾아냈다.' },
+    { t: '잘못 입력된 값과 중복된 줄을 걸러 내고 분석한다.',           a: 4, w: '믿을 수 있는 자료를 다루는 것 — 정확성.' },
+    { t: '초당 6만 건 검색어가 들어와도 곧바로 순위를 보여 준다.',     a: 1, w: '처리·분석 속도의 문제다.' },
+    { t: '창고 하나를 가득 채울 만큼 저장 장치가 필요하다.',           a: 0, w: '규모(Volume)다.' },
+    { t: '출처가 의심스러운 자료는 빼고 분석한다.',                    a: 4, w: '신뢰할 수 있는 데이터를 다룸 — Veracity.' }
+  ];
+
+  /* ---------------- ⑤ 마무리 확인 문제 ---------------- */
+  var QF = [
+    { t: '빅데이터는 <b>양이 많기만 하면</b> 빅데이터라고 할 수 있다.', o: ['○', '✕'], a: 1,
+      w: '아니다. <b>생성 주기가 짧은 방대한 디지털 데이터</b>이면서, 그것에서 <b>가치를 뽑아내는 기술</b>까지 함께 뜻한다.' },
+    { t: '콤마(,)로 항목을 구별하는 CSV 파일은 <b>정형</b> 데이터다.', o: ['○', '✕'], a: 0,
+      w: '맞다. 형식과 구조가 고정되어 있다.' },
+    { t: '3V 는 규모(Volume) · 속도(Velocity) · 다양성(Variety) 이다.', o: ['○', '✕'], a: 0,
+      w: '맞다. 여기에 가치(Value) · 정확성(Veracity) 이 더해지기도 한다.' },
+    { t: '「기존에는 MB·GB 로 다루던 것을 이제 TB·PB·EB 로 다룬다」는 어느 특징인가?',
+      o: ['Volume 규모', 'Velocity 속도', 'Variety 다양성', 'Value 가치'], a: 0,
+      w: '단위가 커진 것은 <b>규모</b>의 문제다.' },
+    { t: '3V 에 더해지기도 하는 특징 두 가지는?',
+      o: ['가치 · 정확성', '규모 · 속도', '가치 · 다양성', '정확성 · 속도'], a: 0,
+      w: '가치(Value, 숨겨진 가치를 찾음) · 정확성(Veracity, 유용하고 신뢰할 수 있는 데이터를 다룸).' },
+    { t: '다음 중 <b>비정형</b> 데이터가 <u>아닌</u> 것은?',
+      o: ['음성 메시지', '축제 사진', '학번·이름·반이 적힌 엑셀 명단', '한글 보고서'], a: 2,
+      w: '엑셀 명단은 열이 정해진 <b>정형</b> 데이터다.' }
+  ];
+
+  /* ---------------- ⑥ 내 기기 데이터 (점수에 넣지 않는 자기 점검) ---------------- */
+  var MY = [
+    { t: '📷 사진', k: 'U' }, { t: '🎬 동영상', k: 'U' }, { t: '🎵 음악·녹음', k: 'U' },
+    { t: '💬 메시지 대화', k: 'U' }, { t: '📍 위치 기록', k: 'U' }, { t: '📝 SNS 게시물', k: 'U' },
+    { t: '📇 연락처 목록', k: 'S' }, { t: '🚶 걸음 수 기록', k: 'S' },
+    { t: '💰 용돈·가계부', k: 'S' }, { t: '🗓️ 시간표', k: 'S' }
+  ];
+
+  /* ---------------- 단위 저울 자료 ---------------- */
+  var UNITS = [
+    { n: 'B',  like: '글자 한 개 — 한글 한 자는 3바이트다',              zone: '' },
+    { n: 'KB', like: '짧은 문자 한 통 — 한글 340자쯤',                   zone: '' },
+    { n: 'MB', like: '책 한 권 분량의 글 — 한글 30만 자쯤',              zone: 'old' },
+    { n: 'GB', like: '노래 250곡쯤 (한 곡 4MB로 볼 때)',                 zone: 'old' },
+    { n: 'TB', like: '사진 26만 장쯤 (한 장 4MB로 볼 때)',               zone: 'big' },
+    { n: 'PB', like: '영화 26만 편쯤 (한 편 4GB로 볼 때)',               zone: 'big' },
+    { n: 'EB', like: '영화 2억 6천만 편쯤 — 사람이 평생 못 다 본다',     zone: 'big' }
+  ];
+
+  /* ======================= 저장 · 채점 틀 ======================= */
+  var ANS = { blank: {}, sort: {}, q11: {}, qv: {}, qf: {}, my: {}, shown: {} };
+
+  function load() {
+    try {
+      var s = JSON.parse(localStorage.getItem(SAVE_KEY) || '{}');
+      ['blank', 'sort', 'q11', 'qv', 'qf', 'my', 'shown'].forEach(function (k) {
+        if (s[k] && typeof s[k] === 'object') ANS[k] = s[k];
+      });
+    } catch (e) { /* 저장된 것이 깨졌으면 그냥 새로 시작한다 */ }
+  }
+  function save() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(ANS)); } catch (e) { }
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  function norm(s) { return String(s || '').replace(/\s+/g, '').toLowerCase(); }
+
+  /* 각 부분의 채점 결과를 한곳에서 모은다 */
+  var GROUPS = [
+    { id: 'gbl',   name: '1.2 · 1.3 괄호 채우기', total: 5 },
+    { id: 'g11',   name: '1.1 빅데이터일까?',      total: Q11.length },
+    { id: 'gsort', name: '1.2 정형·비정형 분류',   total: SORTS.length },
+    { id: 'gv',    name: '어떤 V 일까?',           total: QV.length },
+    { id: 'gf',    name: '배운 것 확인하기',       total: QF.length }
+  ];
+
+  /* ======================= 화면 만들기 ======================= */
+
+  /** ○/✕ 또는 여러 선택지 문항 하나를 만든다 */
+  function makeQ(box, list, store, optsOf, no0) {
+    box.innerHTML = '';
+    list.forEach(function (q, i) {
+      var opts = optsOf(q);
+      var wrap = document.createElement('div');
+      wrap.className = 'q';
+      wrap.id = store + '_' + i;
+      var html = '<div class="ask"><span class="no">' + (no0 + i) + '</span>' + q.t + '</div><div class="opts">';
+      opts.forEach(function (o, j) { html += '<button class="opt" data-j="' + j + '">' + o + '</button>'; });
+      html += '</div><div class="sol"></div>';
+      wrap.innerHTML = html;
+
+      wrap.querySelectorAll('.opt').forEach(function (b) {
+        b.addEventListener('click', function () {
+          if (wrap.classList.contains('right') || wrap.classList.contains('wrong')) return;  /* 채점 뒤에는 못 바꾼다 */
+          wrap.querySelectorAll('.opt').forEach(function (x) { x.classList.remove('on'); });
+          b.classList.add('on');
+          ANS[store][i] = Number(b.dataset.j);
+          save();
+        });
+      });
+      box.appendChild(wrap);
+    });
+    restoreQ(box, store);
+  }
+
+  function restoreQ(box, store) {
+    Object.keys(ANS[store]).forEach(function (i) {
+      var wrap = $(store + '_' + i);
+      if (!wrap) return;
+      var b = wrap.querySelector('.opt[data-j="' + ANS[store][i] + '"]');
+      if (b) b.classList.add('on');
+    });
+  }
+
+  /** 고른 것과 정답을 대조해 색과 해설을 붙인다. 맞은 개수를 돌려준다 */
+  function gradeQ(list, store, ansIndexOf) {
+    var got = 0;
+    list.forEach(function (q, i) {
+      var wrap = $(store + '_' + i);
+      if (!wrap) return;
+      var picked = ANS[store][i];
+      var right = ansIndexOf(q);
+      var ok = (picked === right);
+      if (ok) got++;
+      wrap.classList.remove('right', 'wrong');
+      wrap.classList.add(picked === undefined ? 'wrong' : (ok ? 'right' : 'wrong'));
+      var opts = wrap.querySelectorAll('.opt');
+      if (opts[right]) opts[right].style.boxShadow = '0 0 0 3px #1a8f52';
+      wrap.querySelector('.sol').innerHTML =
+        (picked === undefined ? '<b>고르지 않았다.</b> ' : (ok ? '<b>맞았다!</b> ' : '<b>아쉽다.</b> ')) +
+        '정답은 <b>' + opts[right].textContent + '</b> — ' + q.w;
+    });
+    return got;
+  }
+
+  function resetQ(list, store) {
+    ANS[store] = {};
+    list.forEach(function (q, i) {
+      var wrap = $(store + '_' + i);
+      if (!wrap) return;
+      wrap.classList.remove('right', 'wrong');
+      wrap.querySelector('.sol').innerHTML = '';
+      wrap.querySelectorAll('.opt').forEach(function (b) { b.classList.remove('on'); b.style.boxShadow = ''; });
+    });
+    save();
+  }
+
+  /* ---- 정형·비정형 분류 카드 ---- */
+  function buildSort() {
+    var box = $('sortCards');
+    box.innerHTML = '';
+    SORTS.forEach(function (c, i) {
+      var d = document.createElement('div');
+      d.className = 'dcard';
+      d.id = 'sort_' + i;
+      d.innerHTML =
+        '<div class="face"><span class="ico">' + c.i + '</span><span>' + c.t + '</span></div>' +
+        '<div class="pickrow">' +
+          '<button data-v="S">정형</button><button data-v="U">비정형</button>' +
+        '</div><div class="why"></div>';
+      d.querySelectorAll('.pickrow button').forEach(function (b) {
+        b.addEventListener('click', function () {
+          if (d.classList.contains('right') || d.classList.contains('wrong')) return;
+          d.querySelectorAll('.pickrow button').forEach(function (x) { x.classList.remove('on'); });
+          b.classList.add('on');
+          ANS.sort[i] = b.dataset.v;
+          save();
+        });
+      });
+      box.appendChild(d);
+    });
+    Object.keys(ANS.sort).forEach(function (i) {
+      var d = $('sort_' + i);
+      if (!d) return;
+      var b = d.querySelector('.pickrow button[data-v="' + ANS.sort[i] + '"]');
+      if (b) b.classList.add('on');
+    });
+  }
+
+  function gradeSort() {
+    var got = 0;
+    SORTS.forEach(function (c, i) {
+      var d = $('sort_' + i);
+      var picked = ANS.sort[i];
+      var ok = picked === c.a;
+      if (ok) got++;
+      d.classList.remove('right', 'wrong');
+      d.classList.add(ok ? 'right' : 'wrong');
+      d.querySelector('.why').innerHTML =
+        (picked ? (ok ? '<b>맞았다!</b> ' : '<b>아쉽다.</b> ') : '<b>고르지 않았다.</b> ') +
+        '정답 <b>' + (c.a === 'S' ? '정형' : '비정형') + '</b> — ' + c.w;
+    });
+    return got;
+  }
+
+  function resetSort() {
+    ANS.sort = {};
+    SORTS.forEach(function (c, i) {
+      var d = $('sort_' + i);
+      d.classList.remove('right', 'wrong');
+      d.querySelector('.why').innerHTML = '';
+      d.querySelectorAll('.pickrow button').forEach(function (b) { b.classList.remove('on'); });
+    });
+    save();
+  }
+
+  /* ---- 괄호 채우기 ---- */
+  function buildBlanks() {
+    Object.keys(BLANKS).forEach(function (k) {
+      var el = document.querySelector('[data-blank="' + k + '"]');
+      if (!el) return;
+      if (ANS.blank[k]) el.value = ANS.blank[k];
+      el.addEventListener('input', function () {
+        ANS.blank[k] = el.value;
+        el.classList.remove('good', 'bad');
+        save();
+      });
+      el.addEventListener('keydown', function (e) { if (e.key === 'Enter') gradeBlanks(); });
+    });
+    document.querySelectorAll('[data-hint]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var k = b.dataset.hint;
+        window.toast && window.toast('힌트 — ' + BLANKS[k].hint);
+      });
+    });
+  }
+
+  function gradeBlanks() {
+    var got = 0;
+    Object.keys(BLANKS).forEach(function (k) {
+      var el = document.querySelector('[data-blank="' + k + '"]');
+      if (!el) return;
+      var v = norm(el.value);
+      var ok = BLANKS[k].ok.some(function (a) { return norm(a) === v; });
+      el.classList.remove('good', 'bad');
+      el.classList.add(ok ? 'good' : 'bad');
+      if (!ok) el.value = BLANKS[k].show;      /* 틀렸으면 정답을 보여 준다 */
+      else got++;
+    });
+    $('sbl').innerHTML = '괄호 <b>' + got + ' / 5</b> 개를 맞혔다. (틀린 칸에는 정답을 적어 두었다)';
+    return got;
+  }
+
+  function resetBlanks() {
+    ANS.blank = {};
+    Object.keys(BLANKS).forEach(function (k) {
+      var el = document.querySelector('[data-blank="' + k + '"]');
+      if (el) { el.value = ''; el.classList.remove('good', 'bad'); }
+    });
+    $('sbl').textContent = '';
+    save();
+  }
+
+  /* ======================= Volume · 단위 저울 ======================= */
+  function drawVol() {
+    var i = Number($('volRange').value);
+    var u = UNITS[i];
+    $('volName').innerHTML = '1 ' + u.n;
+    $('volLike').innerHTML = '➜ ' + u.like;
+    $('volCalc').innerHTML = i === 0 ? '= 1바이트' : '= 1,024 ' + UNITS[i - 1].n + ' = 1,024<sup>' + i + '</sup> 바이트';
+    $('volZone').innerHTML = u.zone === 'old'
+      ? '<span class="vbadge" style="background:#5d8a6c">기존 자료 처리 단위</span>'
+      : (u.zone === 'big' ? '<span class="vbadge">빅데이터 단위</span>' : '<span class="vbadge" style="background:#9aa7bd">아주 작은 단위</span>');
+
+    var html = '';
+    UNITS.forEach(function (x, j) {
+      html += '<div class="bar' + (j === i ? ' on' : '') + '">' +
+        '<span class="nm">' + x.n + '</span>' +
+        '<span class="fill" style="width:' + Math.round((j + 1) / UNITS.length * 100) + '%"></span>' +
+        '<span class="txt">' + (j === i ? '◀ 지금 여기' : '') + '</span></div>';
+    });
+    $('volBars').innerHTML = html;
+  }
+
+  /* ======================= Velocity · 초당 발생 ======================= */
+  var velTimer = null, velSec = 0, velExact = 0;
+
+  /**
+   * 손잡이 위치(0~60)를 1 ~ 100,000 건/초로 바꾼다 (로그 눈금).
+   * ⚠️ 프리셋 단추를 누른 경우에는 그 값을 그대로 쓴다 —
+   *    로그 눈금은 칸이 굵어서, 손잡이만 옮기면 60,000 이 56,234 처럼 어긋나 보인다.
+   */
+  function velRate() {
+    if (velExact) return velExact;
+    var t = Number($('velRange').value) / 60;
+    return Math.max(1, Math.round(Math.pow(10, t * 5)));
+  }
+  function comma(n) { return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  /** 큰 수를 만·억·조로 읽기 좋게. 100을 넘으면 소수점을 떼고 자릿점을 넣는다 (8,640만 건) */
+  function big(n) {
+    var unit = function (v, u) {
+      return (v >= 100 ? comma(v) : v.toFixed(1).replace(/\.0$/, '')) + u;
+    };
+    if (n >= 1e12) return unit(n / 1e12, '조 건');
+    if (n >= 1e8) return unit(n / 1e8, '억 건');
+    if (n >= 1e4) return unit(n / 1e4, '만 건');
+    return comma(n) + ' 건';
+  }
+  function drawVel() {
+    var r = velRate();
+    $('velRate').innerHTML = comma(r) + '<small> 건/초</small>';
+    $('vel1m').textContent = big(r * 60);
+    $('vel1h').textContent = big(r * 3600);
+    $('vel1d').textContent = big(r * 86400);
+    $('vel1y').textContent = big(r * 86400 * 365);
+    $('velLive').textContent = comma(r * velSec);
+    $('velSec').textContent = velSec;
+  }
+
+  /* ======================= Velocity · 월말 고지서 ↔ 실시간 앱 ======================= */
+  var monthTimer = null, day = 1, money = 0;
+  function drawMonth() {
+    $('dayNo').textContent = day;
+    $('dayBar').style.width = Math.round(day / 30 * 100) + '%';
+    $('newMoney').textContent = comma(money) + ' 원';
+    if (day >= 30) {
+      $('oldMoney').textContent = comma(money) + ' 원';
+      $('oldNote').innerHTML = '<b>30일이 지나서야</b> 알게 되었다';
+    } else {
+      $('oldMoney').textContent = '? 원';
+      $('oldNote').innerHTML = '고지서까지 <b>' + (30 - day) + '일</b> 남았다';
+    }
+    $('newNote').innerHTML = day >= 30 ? '한 달 동안 <b>매일</b> 알고 있었다' : '쓰는 순간 바로 보인다';
+  }
+
+  /* ======================= Variety · 내 기기 ======================= */
+  function buildMy() {
+    var box = $('myData');
+    box.innerHTML = '';
+    MY.forEach(function (m, i) {
+      var l = document.createElement('label');
+      l.className = 'chk' + (ANS.my[i] ? ' on' : '');
+      l.innerHTML = '<input type="checkbox"' + (ANS.my[i] ? ' checked' : '') + '><span>' + m.t + '</span>';
+      l.querySelector('input').addEventListener('change', function (e) {
+        ANS.my[i] = e.target.checked ? 1 : 0;
+        l.classList.toggle('on', e.target.checked);
+        save(); drawPie();
+      });
+      box.appendChild(l);
+    });
+    drawPie();
+  }
+
+  function drawPie() {
+    var s = 0, u = 0;
+    MY.forEach(function (m, i) { if (ANS.my[i]) { if (m.k === 'S') s++; else u++; } });
+    var all = s + u;
+    var deg = all ? Math.round(s / all * 360) : 0;
+    $('myPie').style.background = all
+      ? 'conic-gradient(#2b5bd7 0deg ' + deg + 'deg, #7b3fc4 ' + deg + 'deg 360deg)'
+      : 'repeating-linear-gradient(45deg,#e6ebf5 0 10px,#f2f5fa 10px 20px)';
+    $('pieS').textContent = s;
+    $('pieU').textContent = u;
+    $('pieMsg').innerHTML = !all
+      ? '가지고 있는 것을 눌러 보자.'
+      : (u > s
+        ? '비정형이 <b>' + Math.round(u / all * 100) + '%</b> — 내 기기에도 <b>비정형이 더 많다</b>. 빅데이터에서 다양성(Variety)이 중요한 까닭이다.'
+        : (u === s ? '정형과 비정형이 반반이다. 사진·동영상을 떠올려 보면 대개 비정형이 더 많다.'
+                   : '정형이 더 많게 나왔다. 사진·동영상·대화도 데이터라는 것을 떠올려 보자.'));
+  }
+
+  /* ======================= 점수판 ======================= */
+  var SCORE = {};   /* 부분별 맞은 개수 (채점한 부분만 들어 있다) */
+
+  function drawScore() {
+    var got = 0, all = 0, rows = '<tr><th>부분</th><th>맞은 개수</th><th>문항 수</th></tr>';
+    GROUPS.forEach(function (g) {
+      all += g.total;
+      var has = SCORE[g.id] !== undefined;
+      if (has) got += SCORE[g.id];
+      rows += '<tr><td class="l">' + g.name + '</td><td>' +
+        (has ? '<b>' + SCORE[g.id] + '</b>' : '<span style="color:#98a2b6">아직</span>') +
+        '</td><td>' + g.total + '</td></tr>';
+    });
+    $('scGot').textContent = got;
+    $('scAll').textContent = all;
+    $('scBar').style.width = all ? Math.round(got / all * 100) + '%' : '0%';
+    $('scTable').innerHTML = rows;
+
+    var done = GROUPS.filter(function (g) { return SCORE[g.id] !== undefined; }).length;
+    var rate = all ? Math.round(got / all * 100) : 0;
+    $('scMsg').innerHTML = done === 0
+      ? '문제를 풀고 [정답 확인] 을 누르면 점수가 쌓인다.'
+      : (done < GROUPS.length
+        ? '5개 부분 가운데 <b>' + done + '개</b>를 채점했다. 나머지도 풀어 보자.'
+        : (rate >= 90 ? '<b>훌륭하다!</b> 빅데이터의 개념과 3V 를 잘 설명할 수 있다.'
+          : rate >= 70 ? '<b>잘했다.</b> 틀린 문항의 해설을 한 번만 더 읽어 보자.'
+            : '<b>해설을 읽고 다시 풀어 보자.</b> 정형·비정형과 3V 를 구별하는 것이 핵심이다.'));
+
+    ANS.shown = SCORE;
+    save();
+
+    /* 탭②가 제출할 때 쓰는 값 */
+    window.CONCEPT_SCORE = { got: got, total: all, graded: done };
+  }
+
+  /**
+   * 탭②의 [나가기] 가 부른다 — 이 컴퓨터에 남은 풀이 기록을 지운다.
+   * 컴퓨터실에서 다음 학생에게 앞 학생의 답이 보이지 않게 하는 것이 목적이다.
+   */
+  window.clearConceptRecord = function () {
+    try { localStorage.removeItem(SAVE_KEY); } catch (e) { }
+    ANS = { blank: {}, sort: {}, q11: {}, qv: {}, qf: {}, my: {}, shown: {} };
+    SCORE = {};
+  };
+
+  /** 탭②(활동지)가 부른다 — 제출할 개념 점수 */
+  window.conceptScore = function () {
+    var got = 0, all = 0, done = 0;
+    GROUPS.forEach(function (g) {
+      all += g.total;
+      if (SCORE[g.id] !== undefined) { got += SCORE[g.id]; done++; }
+    });
+    return { got: got, total: all, graded: done, groups: GROUPS.length };
+  };
+
+  /* ======================= 시작 ======================= */
+  document.addEventListener('DOMContentLoaded', function () {
+    load();
+    if (ANS.shown && typeof ANS.shown === 'object') SCORE = ANS.shown;
+
+    buildBlanks();
+    makeQ($('q11'), Q11, 'q11', function () { return ['○ 빅데이터', '✕ 아니다']; }, 1);
+    buildSort();
+    makeQ($('qv'), QV, 'qv', function () { return VOPT; }, 1);
+    makeQ($('qf'), QF, 'qf', function (q) { return q.o; }, 1);
+    buildMy();
+
+    /* 채점 · 다시 풀기 단추 */
+    document.querySelectorAll('[data-check]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var g = b.dataset.check, got = 0;
+        if (g === 'gbl') got = gradeBlanks();
+        if (g === 'g11') { got = gradeQ(Q11, 'q11', function (q) { return q.a === 'O' ? 0 : 1; }); $('s11').innerHTML = '<b>' + got + ' / ' + Q11.length + '</b> 개를 맞혔다.'; }
+        if (g === 'gsort') { got = gradeSort(); $('ssort').innerHTML = '<b>' + got + ' / ' + SORTS.length + '</b> 장을 맞혔다.'; }
+        if (g === 'gv') { got = gradeQ(QV, 'qv', function (q) { return q.a; }); $('sv').innerHTML = '<b>' + got + ' / ' + QV.length + '</b> 개를 맞혔다.'; }
+        if (g === 'gf') { got = gradeQ(QF, 'qf', function (q) { return q.a; }); $('sf').innerHTML = '<b>' + got + ' / ' + QF.length + '</b> 개를 맞혔다.'; }
+        SCORE[g] = got;
+        drawScore();
+        window.toast && window.toast('채점했다 — ' + got + '개 정답');
+      });
+    });
+    document.querySelectorAll('[data-again]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var g = b.dataset.again;
+        if (g === 'gbl') resetBlanks();
+        if (g === 'g11') { resetQ(Q11, 'q11'); $('s11').textContent = ''; }
+        if (g === 'gsort') { resetSort(); $('ssort').textContent = ''; }
+        if (g === 'gv') { resetQ(QV, 'qv'); $('sv').textContent = ''; }
+        if (g === 'gf') { resetQ(QF, 'qf'); $('sf').textContent = ''; }
+        delete SCORE[g];
+        drawScore();
+      });
+    });
+    $('scClear').addEventListener('click', function () {
+      if (!confirm('풀어 둔 답과 점수를 모두 지우고 처음부터 다시 풀까요?')) return;
+      resetBlanks(); resetQ(Q11, 'q11'); resetSort(); resetQ(QV, 'qv'); resetQ(QF, 'qf');
+      $('s11').textContent = ''; $('ssort').textContent = ''; $('sv').textContent = ''; $('sf').textContent = '';
+      SCORE = {}; ANS.shown = {};
+      drawScore();
+    });
+
+    /* 표 ↔ CSV */
+    $('btnFormToggle').addEventListener('click', function () {
+      var t = $('tableView'), c = $('csvView');
+      var showCsv = t.classList.toggle('hidden');
+      c.classList.toggle('hidden', !showCsv);
+      $('formNote').innerHTML = showCsv
+        ? '<b>CSV</b> — 콤마로 항목을 구별한다. 겉모습은 글이지만 <b>구조가 고정</b>되어 있다.'
+        : '<b>표</b> — 행과 열로 데이터를 구별한다.';
+    });
+
+    /* Volume */
+    $('volRange').addEventListener('input', drawVol);
+    drawVol();
+
+    /* Velocity — 초당 발생 */
+    $('velRange').addEventListener('input', function () { velExact = 0; drawVel(); });
+    document.querySelectorAll('[data-vel]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var want = Number(b.dataset.vel);
+        velExact = want;                                             /* 프리셋은 값을 그대로 쓴다 */
+        $('velRange').value = Math.round(Math.log10(want) / 5 * 60);  /* 손잡이도 그 자리로 옮긴다 */
+        drawVel();
+      });
+    });
+    $('velPlay').addEventListener('click', function () {
+      if (velTimer) {
+        clearInterval(velTimer); velTimer = null;
+        $('velPlay').textContent = '▶ 이어서 세기';
+        return;
+      }
+      $('velPlay').textContent = '■ 잠깐 멈춤';
+      velTimer = setInterval(function () { velSec++; drawVel(); }, 1000);
+    });
+    $('velReset').addEventListener('click', function () {
+      if (velTimer) { clearInterval(velTimer); velTimer = null; }
+      velSec = 0; $('velPlay').textContent = '▶ 지금부터 세어 보기'; drawVel();
+    });
+    drawVel();
+
+    /* Velocity — 한 달 */
+    $('monthPlay').addEventListener('click', function () {
+      if (monthTimer) return;
+      day = 1; money = 0; drawMonth();
+      $('monthPlay').disabled = true;
+      monthTimer = setInterval(function () {
+        day++;
+        money += 300 + Math.round(Math.random() * 1500);   /* 그날 쓴 요금 */
+        if (day >= 30) {
+          day = 30;
+          clearInterval(monthTimer); monthTimer = null;
+          $('monthPlay').disabled = false;
+          $('monthPlay').textContent = '▶ 다시 한 달 흘려보내기';
+        }
+        drawMonth();
+      }, 220);
+    });
+    drawMonth();
+
+    drawScore();
+  });
+})();
+</script>
