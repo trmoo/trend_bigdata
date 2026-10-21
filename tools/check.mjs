@@ -193,7 +193,8 @@ const MUST = {
 };
 Object.keys(MUST).forEach(rel => {
   const p = path.join(MUST[rel], rel);
-  if (!fs.existsSync(p)) { bad(`${rel} 파일이 없다`); return; }
+  // CLAUDE.md 는 깃허브에 올리지 않으므로 받은 저장소에는 없을 수 있다
+  if (!fs.existsSync(p)) { if (rel !== 'CLAUDE.md') bad(`${rel} 파일이 없다`); return; }
   if (!fs.readFileSync(p, 'utf8').includes('티쳐무')) bad(`${rel} 에 저작권 표시(티쳐무)가 없다`);
 });
 /* 학생이 보는 화면 아래 푸터에도 있어야 한다 */
