@@ -1,0 +1,49 @@
+# 체험 페이지 배포 — 푸시마다 점검 · 시험을 돌리고, 통과하면 dist/site/ 를 깃허브 Pages 에 올린다.
+# © 2026 티쳐무 · 모든 권리 보유
+#
+# 진짜 앱은 구글 앱스 스크립트 웹앱이라 Pages 에서는 돌지 않는다.
+# Pages 에 올리는 것은 가짜 시트 위에서 진짜 Code.gs 가 도는 「체험 페이지」(안내 · 학생) 뿐이다.
+name: 체험 페이지 배포
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 점검
+        run: npm run check
+      - name: 시험 (가짜 시트 위에서 진짜 Code.gs)
+        run: npm test
+      - name: 체험 페이지 만들기 (스스로 점검 — 어긋나면 멈춘다)
+        run: node tools/site.mjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

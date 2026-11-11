@@ -144,6 +144,14 @@
 
 ---
 
+## 체험 페이지
+
+설치 없이 학생 화면을 미리 써 볼 수 있습니다 → **https://trmoo.github.io/trend_bigdata/**
+
+서버 없이 브라우저 안의 가짜 시트에서 진짜 `Code.gs` 가 돌아, 적은 내용은 어디에도 보내지 않고 새로 고치면 사라집니다.
+`node tools/site.mjs` 가 `dist/site/` 에 만들고, 푸시하면 `.github/workflows/deploy.yml` 이 깃허브 Pages 에 올립니다.
+(진짜 앱은 구글 앱스 스크립트 웹앱이라 Pages 에서는 돌지 않습니다 — 이 주소는 체험용입니다.)
+
 ## 저작권
 
 © 2026 티쳐무 · 모든 권리 보유
